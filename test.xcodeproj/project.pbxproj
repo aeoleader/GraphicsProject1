@@ -245,6 +245,7 @@
 				C597F8921BABA5130032563C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
