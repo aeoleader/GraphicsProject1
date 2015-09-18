@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C597F88D1BABA5130032563C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C597F88C1BABA5130032563C /* main.cpp */; };
+		C597F8951BABA89E0032563C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C597F8931BABA89E0032563C /* GLUT.framework */; };
+		C597F8961BABA89E0032563C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C597F8941BABA89E0032563C /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,8 @@
 /* Begin PBXFileReference section */
 		C597F8891BABA5130032563C /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
 		C597F88C1BABA5130032563C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C597F8931BABA89E0032563C /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
+		C597F8941BABA89E0032563C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = ../../../../../../System/Library/Frameworks/OpenGL.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C597F8951BABA89E0032563C /* GLUT.framework in Frameworks */,
+				C597F8961BABA89E0032563C /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,6 +63,8 @@
 		C597F88B1BABA5130032563C /* test */ = {
 			isa = PBXGroup;
 			children = (
+				C597F8931BABA89E0032563C /* GLUT.framework */,
+				C597F8941BABA89E0032563C /* OpenGL.framework */,
 				C597F88C1BABA5130032563C /* main.cpp */,
 			);
 			path = test;
