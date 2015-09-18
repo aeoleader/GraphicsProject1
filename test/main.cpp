@@ -11,7 +11,6 @@
 #include <GLUT/glut.h>
 #include <stdlib.h>
 
-int test = 12;
 //vertices for base
 float ver[][3] =
 {
@@ -68,13 +67,10 @@ void quad(int a,int b,int c,int d)
     glBegin(GL_QUADS);
     glColor3fv(color[a]);
     glVertex3fv(ver[a]);
-    
     glColor3fv(color[b]);
     glVertex3fv(ver[b]);
-    
     glColor3fv(color[c]);
     glVertex3fv(ver[c]);
-    
     glColor3fv(color[d]);
     glVertex3fv(ver[d]);
     glEnd();
@@ -82,13 +78,10 @@ void quad(int a,int b,int c,int d)
     glBegin(GL_QUADS);
     glColor3fv(color[a]);
     glVertex3fv(ver1[a]);
-    
     glColor3fv(color[b]);
     glVertex3fv(ver1[b]);
-    
     glColor3fv(color[c]);
     glVertex3fv(ver1[c]);
-    
     glColor3fv(color[d]);
     glVertex3fv(ver1[d]);
     glEnd();
@@ -96,15 +89,20 @@ void quad(int a,int b,int c,int d)
     glBegin(GL_QUADS);
     glColor3fv(color[a]);
     glVertex3fv(ver2[a]);
-    
     glColor3fv(color[b]);
     glVertex3fv(ver2[b]);
-    
     glColor3fv(color[c]);
     glVertex3fv(ver2[c]);
-    
     glColor3fv(color[d]);
     glVertex3fv(ver2[d]);
+    glEnd();
+    
+    glColor3f(0.0,0.0,0.0);
+    glBegin(GL_LINES);
+    glVertex2d(-0.5,-1.25);
+    glVertex2d(0.5,-1.25);
+    glVertex2d(0.5,-0.8);
+    glVertex2d(-0.5,-0.8);
     glEnd();
 }
 
@@ -196,6 +194,7 @@ void reshape(int w, int h)
         glOrtho(-10.0 * (GLfloat) w / (GLfloat) h, 10.0 * (GLfloat) w / (GLfloat) h, -10.0, 10.0, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
 }
+
 
 int main(int argc, char** argv)
 {
