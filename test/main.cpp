@@ -11,6 +11,7 @@
 #include <GLUT/glut.h>
 #include <stdlib.h>
 
+int test = 12;
 //vertices for base
 float ver[][3] =
 {
@@ -195,7 +196,6 @@ void reshape(int w, int h)
         glOrtho(-10.0 * (GLfloat) w / (GLfloat) h, 10.0 * (GLfloat) w / (GLfloat) h, -10.0, 10.0, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
 }
-
 
 int main(int argc, char** argv)
 {
