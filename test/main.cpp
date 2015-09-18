@@ -14,17 +14,17 @@
 //vertices for base
 float ver[][3] =
 {
-    {-1.25,-1.25,0.10},
-    {-1.25,1.25,0.10},
-    {1.25,1.25,0.10},
-    {1.25,-1.25,0.10},
-    {-1.25,-1.25,-0.10},
-    {-1.25,1.25,-0.10},
-    {1.25,1.25,-0.10},
-    {1.25,-1.25,-0.10},
+    {-1.75,-1.75,0.10},
+    {-1.75,1.75,0.10},
+    {1.75,1.75,0.10},
+    {1.75,-1.75,0.10},
+    {-1.75,-1.75,-0.10},
+    {-1.75,1.75,-0.10},
+    {1.75,1.75,-0.10},
+    {1.75,-1.75,-0.10},
 };
 
-//vertices for bigger cube
+//vertices for cube
 float ver1[][3] =
 {
     {-0.75,-0.75,1.10},
@@ -35,19 +35,6 @@ float ver1[][3] =
     {-0.75,0.75,0.10},
     {0.75,0.75,0.10},
     {0.75,-0.75,0.10},
-};
-
-//vertices for inner cube
-float ver2[][3] =
-{
-    {-0.45,-0.45,1.4},
-    {-0.45,0.45,1.4},
-    {0.45,0.45,1.4},
-    {0.45,-0.45,1.4},
-    {-0.45,-0.45,0.4},
-    {-0.45,0.45,0.4},
-    {0.45,0.45,0.4},
-    {0.45,-0.45,0.4},
 };
 
 GLfloat color[][3] =
@@ -61,6 +48,16 @@ GLfloat color[][3] =
     {0.973, 0.973, 1.000},
     {0.973, 0.973, 1.000},
 };
+
+
+void drawTower()
+{
+    GLUquadricObj *qobj = gluNewQuadric();
+    gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
+    gluQuadricNormals(qobj, GLU_FLAT);
+    //para: base radius/top radius/height/slices/stacks
+    gluCylinder(qobj, 0.5, 0.25, 1.75, 100, 5);
+}
 
 void quad(int a,int b,int c,int d)
 {
@@ -91,20 +88,6 @@ void quad(int a,int b,int c,int d)
     glColor3fv(color[d]);
     glVertex3fv(ver1[d]);
     glEnd();
-    
-    glBegin(GL_QUADS);
-    glColor3fv(color[a]);
-    glVertex3fv(ver2[a]);
-    
-    glColor3fv(color[b]);
-    glVertex3fv(ver2[b]);
-    
-    glColor3fv(color[c]);
-    glVertex3fv(ver2[c]);
-    
-    glColor3fv(color[d]);
-    glVertex3fv(ver2[d]);
-    glEnd();
 }
 
 void colorcube()
@@ -120,11 +103,13 @@ void colorcube()
 // Initialize OpenGL graphics
 void init()
 {
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
     glClearColor (0.0, 0.0, 0.0, 1.0); // clear the viewport to black
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);   // Enable smooth shading
     glMatrixMode(GL_MODELVIEW);
 }
@@ -168,6 +153,8 @@ void mydisplay(void)
     glRotatef( rotate_x, 1.0, 0.0, 0.0 );
     glRotatef( rotate_y, 0.0, 1.0, 0.0 );
     colorcube();
+    glTranslatef(1.0, 0.0, 0.0);
+    drawTower();
     
     glutSwapBuffers();
 }
@@ -177,7 +164,7 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-        case 'q':
+        case 27:  /*  Escape Key  */
             exit(0);
             break;
     }
@@ -201,7 +188,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc,argv); //set window properties
     glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
-    glutInitWindowSize(800,600);
+    glutInitWindowSize(600,600);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Project 1: Taj Mahal");
     glutDisplayFunc(mydisplay); //display callback
