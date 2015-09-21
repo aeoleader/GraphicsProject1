@@ -63,8 +63,8 @@
 		C597F88B1BABA5130032563C /* test */ = {
 			isa = PBXGroup;
 			children = (
-				C597F8931BABA89E0032563C /* GLUT.framework */,
 				C597F8941BABA89E0032563C /* OpenGL.framework */,
+				C597F8931BABA89E0032563C /* GLUT.framework */,
 				C597F88C1BABA5130032563C /* main.cpp */,
 			);
 			path = test;
