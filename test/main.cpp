@@ -70,6 +70,23 @@ void drawTower()
     
     //para: base radius/top radius/height/slices/stacks
     gluCylinder(qobj, 0.12, 0.12, 0.15, 20, 5);
+    
+    glTranslatef(0.0, 0.0, 0.15);
+    gluDisk(qobj, 0.0, 0.18, 50, 5);
+    
+    gluSphere(qobj, 0.12, 15, 20);
+    
+    glTranslatef(0.0, 0.0, 0.12);
+    gluCylinder(qobj, 0.01, 0.01, 0.15, 20, 5);
+    
+    glTranslatef(0.0, 0.0, 0.05);
+    gluSphere(qobj, 0.025, 15, 20);
+    
+    glTranslatef(0.0, 0.0, 0.05);
+    gluSphere(qobj, 0.02, 15, 20);
+    
+    glTranslatef(0.0, 0.0, 0.05);
+    gluSphere(qobj, 0.015, 15, 20);
     glPopMatrix();
 }
 
