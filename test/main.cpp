@@ -1,216 +1,103 @@
-/* Activity.cpp
- 
- September 14th, 2007*/
+//
+//  main.cpp
+//  sphere demo
+//
+//  Created by Xiangyu on 9/20/15.
+//  Copyright (c) 2015 Xiangyu. All rights reserved.
+//
 
-/* Starter file for in class activity
- 
- */
-#include <math.h>
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+// This program shows three cyan objects illuminated with a single yellow
+// light source.  It illustrates several of the lighting parameters.
+
+#ifdef __APPLE_CC__
 #include <GLUT/glut.h>
-#include <stdlib.h>
+#else
+#include <GL/glut.h>
+#endif
 
-int test = 12;
-//vertices for base
-float ver[][3] =
-{
-    {-1.25,-1.25,0.10},
-    {-1.25,1.25,0.10},
-    {1.25,1.25,0.10},
-    {1.25,-1.25,0.10},
-    {-1.25,-1.25,-0.10},
-    {-1.25,1.25,-0.10},
-    {1.25,1.25,-0.10},
-    {1.25,-1.25,-0.10},
-};
-
-//vertices for bigger cube
-float ver1[][3] =
-{
-    {-0.75,-0.75,1.10},
-    {-0.75,0.75,1.10},
-    {0.75,0.75,1.10},
-    {0.75,-0.75,1.10},
-    {-0.75,-0.75,0.10},
-    {-0.75,0.75,0.10},
-    {0.75,0.75,0.10},
-    {0.75,-0.75,0.10},
-};
-
-//vertices for inner cube
-float ver2[][3] =
-{
-    {-0.45,-0.45,1.4},
-    {-0.45,0.45,1.4},
-    {0.45,0.45,1.4},
-    {0.45,-0.45,1.4},
-    {-0.45,-0.45,0.4},
-    {-0.45,0.45,0.4},
-    {0.45,0.45,0.4},
-    {0.45,-0.45,0.4},
-};
-
-GLfloat color[][3] =
-{
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-    {0.973, 0.973, 1.000},
-};
-
-void quad(int a,int b,int c,int d)
-{
-    glBegin(GL_QUADS);
-    glColor3fv(color[a]);
-    glVertex3fv(ver[a]);
-    
-    glColor3fv(color[b]);
-    glVertex3fv(ver[b]);
-    
-    glColor3fv(color[c]);
-    glVertex3fv(ver[c]);
-    
-    glColor3fv(color[d]);
-    glVertex3fv(ver[d]);
-    glEnd();
-    
-    glBegin(GL_QUADS);
-    glColor3fv(color[a]);
-    glVertex3fv(ver1[a]);
-    
-    glColor3fv(color[b]);
-    glVertex3fv(ver1[b]);
-    
-    glColor3fv(color[c]);
-    glVertex3fv(ver1[c]);
-    
-    glColor3fv(color[d]);
-    glVertex3fv(ver1[d]);
-    glEnd();
-    
-    glBegin(GL_QUADS);
-    glColor3fv(color[a]);
-    glVertex3fv(ver2[a]);
-    
-    glColor3fv(color[b]);
-    glVertex3fv(ver2[b]);
-    
-    glColor3fv(color[c]);
-    glVertex3fv(ver2[c]);
-    
-    glColor3fv(color[d]);
-    glVertex3fv(ver2[d]);
-    glEnd();
-}
-
-void colorcube()
-{
-    quad(0,3,2,1);
-    quad(2,3,7,6);
-    quad(0,4,7,3);
-    quad(1,2,6,5);
-    quad(4,5,6,7);
-    quad(0,1,5,4);
-}
-
-// Initialize OpenGL graphics
-void init()
-{
-    glClearColor (0.0, 0.0, 0.0, 1.0); // clear the viewport to black
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    glEnable(GL_DEPTH_TEST);
-    glShadeModel(GL_SMOOTH);   // Enable smooth shading
+// Clears the window and depth buffer and draws three solids.
+//
+// The solids are placed so that they either sit or float above the x-z plane;
+// therefore note one of the first things that is done is to rotate the whole
+// scene 20 degrees about x to turn the top of the scene toward the viewer.
+// This lets the viewer see how the torus goes around the cone.
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
-}
-
-double rotate_y = 0;
-double rotate_x = 0;
-void specialKeys( int key, int x, int y )
-{
-    if (key == GLUT_KEY_RIGHT)
-        rotate_y += 5;
-    else if (key == GLUT_KEY_LEFT)
-        rotate_y -= 5;
-    else if (key == GLUT_KEY_UP)
-        rotate_x += 5;
-    else if (key == GLUT_KEY_DOWN)
-        rotate_x -= 5;
-    glutPostRedisplay();
-}
-
-void mydisplay(void)
-{
-    glClearColor( 0, 0, 0, 1 );
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();
     
-    glMatrixMode( GL_PROJECTION );
+    // Rotate the scene so we can see the tops of the shapes.
+    glRotatef(-20.0, 1.0, 0.0, 0.0);
+    
+    // Make a torus floating 0.5 above the x-z plane.  The standard torus in
+    // the GLUT library is, perhaps surprisingly, a stack of circles which
+    // encircle the z-axis, so we need to rotate it 90 degrees about x to
+    // get it the way we want.
+    
+    // Add a sphere to the scene.
+    glPushMatrix();
+    glTranslatef(0.75, 0.0, -1.0);
+    glutSolidSphere(1.0, 30, 30);
+    glPopMatrix();
+    
+    glPopMatrix();
+    glFlush();
+}
+
+// We don't want the scene to get distorted when the window size changes, so
+// we need a reshape callback.  We'll always maintain a range of -2.5..2.5 in
+// the smaller of the width and height for our viewbox, and a range of -10..10
+// for the viewbox depth.
+void reshape(GLint w, GLint h) {
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    GLfloat aspect = GLfloat(w) / GLfloat(h);
     glLoadIdentity();
-    int w = glutGet( GLUT_WINDOW_WIDTH );
-    int h = glutGet( GLUT_WINDOW_HEIGHT );
-    gluPerspective( 60, w / h, 0.1, 100 );
-    
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-    
-    gluLookAt
-    (
-     3, 3, 3,
-     0, 0, 0,
-     0, 0, 1
-     );
-    
-    glRotatef( rotate_x, 1.0, 0.0, 0.0 );
-    glRotatef( rotate_y, 0.0, 1.0, 0.0 );
-    colorcube();
-    
-    glutSwapBuffers();
-}
-
-// keyboard callback function that exits the application when "q" is pressed
-void keyboard(unsigned char key, int x, int y)
-{
-    switch (key)
-    {
-        case 'q':
-            exit(0);
-            break;
+    if (w <= h) {
+        // width is smaller, so stretch out the height
+        glOrtho(-2.5, 2.5, -2.5/aspect, 2.5/aspect, -10.0, 10.0);
+    } else {
+        // height is smaller, so stretch out the width
+        glOrtho(-2.5*aspect, 2.5*aspect, -2.5, 2.5, -10.0, 10.0);
     }
 }
 
-// reshape function
-void reshape(int w, int h)
-{
-    glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    if (w <= h)
-        glOrtho(-10.0, 10.0, -10.0 * (GLfloat) h / (GLfloat) w, 10.0 * (GLfloat) h / (GLfloat) w, -10.0, 10.0);
-    else
-        glOrtho(-10.0 * (GLfloat) w / (GLfloat) h, 10.0 * (GLfloat) w / (GLfloat) h, -10.0, 10.0, -10.0, 10.0);
-    glMatrixMode(GL_MODELVIEW);
-}
-
-int main(int argc, char** argv)
-{
-    glutInit(&argc,argv); //set window properties
-    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
-    glutInitWindowSize(800,600);
-    glutInitWindowPosition(100,100);
-    glutCreateWindow("Project 1: Taj Mahal");
-    glutDisplayFunc(mydisplay); //display callback
-    glutSpecialFunc( specialKeys );
-    init(); //set OpenGL state
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glEnable(GL_DEPTH_TEST); /* Enable hidden--surface--removal */
+// Performs application specific initialization.  It defines lighting
+// parameters for light source GL_LIGHT0: black for ambient, yellow for
+// diffuse, white for specular, and makes it a directional source
+// shining along <-1, -1, -1>.  It also sets a couple material properties
+// to make cyan colored objects with a fairly low shininess value.  Lighting
+// and depth buffer hidden surface removal are enabled here.
+void init() {
+    GLfloat black[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat yellow[] = { 1.0, 1.0, 0.0, 1.0 };
+    GLfloat cyan[] = { 0.0, 1.0, 1.0, 1.0 };
+    GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat direction[] = { 1.0, 1.0, 1.0, 0.0 };
     
-    glutMainLoop();//enter event loop
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cyan);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 30);
+    
+    glLightfv(GL_LIGHT0, GL_AMBIENT, black);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, yellow);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, white);
+    glLightfv(GL_LIGHT0, GL_POSITION, direction);
+    
+    glEnable(GL_LIGHTING);                // so the renderer considers light
+    glEnable(GL_LIGHT0);                  // turn LIGHT0 on
+    glEnable(GL_DEPTH_TEST);             // so the renderer considers depth
 }
 
+// The usual application statup code.
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowPosition(80, 80);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("Cyan Shapes in Yellow Light");
+    glutReshapeFunc(reshape);
+    glutDisplayFunc(display);
+    init();
+    glutMainLoop();
+}
