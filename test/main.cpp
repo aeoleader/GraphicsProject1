@@ -1,3 +1,7 @@
+//rotate using the left and the right arrow
+//wireframe - 'w'
+//filled - 'f'
+
 /* Activity.cpp
  
  September 14th, 2007*/
