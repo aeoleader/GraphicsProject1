@@ -56,7 +56,21 @@ void drawTower()
     gluQuadricDrawStyle(qobj, GLU_FILL); /* flat shaded */
     gluQuadricNormals(qobj, GLU_FLAT);
     //para: base radius/top radius/height/slices/stacks
-    gluCylinder(qobj, 0.5, 0.25, 1.75, 100, 5);
+    gluCylinder(qobj, 0.35, 0.13, 2.25, 100, 5);
+    
+    glPushMatrix();
+    glTranslatef(0.0, 0.0, 0.75);
+    gluDisk(qobj, 0.28, 0.38, 100, 5);
+    
+    glTranslatef(0.0, 0.0, 0.75);
+    gluDisk(qobj, 0.18, 0.28, 100, 5);
+    
+    glTranslatef(0.0, 0.0, 0.75);
+    gluDisk(qobj, 0.0, 0.20, 100, 5);
+    
+    //para: base radius/top radius/height/slices/stacks
+    gluCylinder(qobj, 0.12, 0.12, 0.15, 20, 5);
+    glPopMatrix();
 }
 
 void quad(int a,int b,int c,int d)
@@ -112,6 +126,7 @@ void init()
     glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     glShadeModel(GL_SMOOTH);   // Enable smooth shading
     glMatrixMode(GL_MODELVIEW);
+    
 }
 
 double rotate_y = 0;
@@ -153,7 +168,7 @@ void mydisplay(void)
     glRotatef( rotate_x, 1.0, 0.0, 0.0 );
     glRotatef( rotate_y, 0.0, 1.0, 0.0 );
     colorcube();
-    glTranslatef(1.0, 0.0, 0.0);
+    glTranslatef(1.25, 1.25, 0.0);
     drawTower();
     
     glutSwapBuffers();
