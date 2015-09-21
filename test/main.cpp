@@ -95,13 +95,10 @@ void quad(int a,int b,int c,int d)
     glBegin(GL_QUADS);
     glColor3fv(color[a]);
     glVertex3fv(ver[a]);
-    
     glColor3fv(color[b]);
     glVertex3fv(ver[b]);
-    
     glColor3fv(color[c]);
     glVertex3fv(ver[c]);
-    
     glColor3fv(color[d]);
     glVertex3fv(ver[d]);
     glEnd();
@@ -109,13 +106,10 @@ void quad(int a,int b,int c,int d)
     glBegin(GL_QUADS);
     glColor3fv(color[a]);
     glVertex3fv(ver1[a]);
-    
     glColor3fv(color[b]);
     glVertex3fv(ver1[b]);
-    
     glColor3fv(color[c]);
     glVertex3fv(ver1[c]);
-    
     glColor3fv(color[d]);
     glVertex3fv(ver1[d]);
     glEnd();
