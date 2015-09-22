@@ -350,7 +350,7 @@ void init(void)
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    glOrtho(-40.0, 40.0, -40.0, 40.0, -40.0, 40.0);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_LIGHTING);
