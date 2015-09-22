@@ -2,9 +2,9 @@
 //wireframe - 'w'
 //filled - 'f'
 
-/* Activity.cpp
+/* main.cpp
  
- September 14th, 2007*/
+ September 23rd, 2015*/
 
 /* Starter file for in class activity
  
@@ -15,11 +15,20 @@
 #include <GLUT/glut.h>
 #include <stdlib.h>
 
-static double rotate_x = 0;
+const int INIT_WINDOW_SIZE = 800;
+int current_width = INIT_WINDOW_SIZE;
+int current_height = INIT_WINDOW_SIZE;
+static double rotate_x = -58.0;
+
+static double rotate_y = 0;
+double xm = 0.0;
+double ym = 0.0;
 GLuint towersDLid;
 
+float x=5.0f,y=3.0f,z=3.0f;    // camera points
+float lx=-5.0f,ly=-3.0f,lz=-2.0f; // reference points
+
 //vertices for base
-//@Nan: I changed the values from 1.25 to 1.50 to make the base bigger.
 float ver[][3] =
 {
     {-1.50,-1.50,0.10},
@@ -35,107 +44,93 @@ float ver[][3] =
 //vertices for bigger cube
 float ver1[][3] =
 {
-    {-0.75,-0.75,1.10},
-    {-0.75,0.75,1.10},
-    {0.75,0.75,1.10},
-    {0.75,-0.75,1.10},
-    {-0.75,-0.75,0.10},
-    {-0.75,0.75,0.10},
-    {0.75,0.75,0.10},
-    {0.75,-0.75,0.10},
+    {-0.95,-0.95,1.3},
+    {-0.95,0.95,1.3},
+    {0.95,0.95,1.3},
+    {0.95,-0.95,1.3},
+    {-0.95,-0.95,0.10},
+    {-0.95,0.95,0.10},
+    {0.95,0.95,0.10},
+    {0.95,-0.95,0.10},
 };
 
 //vertices for inner cube
 float ver2[][3] =
 {
-    {-0.45,-0.45,1.4},
-    {-0.45,0.45,1.4},
-    {0.45,0.45,1.4},
-    {0.45,-0.45,1.4},
-    {-0.45,-0.45,0.4},
-    {-0.45,0.45,0.4},
-    {0.45,0.45,0.4},
-    {0.45,-0.45,0.4},
+    {-0.6,-0.6,1.45},
+    {-0.6,0.6,1.45},
+    {0.6,0.6,1.45},
+    {0.6,-0.6,1.45},
+    {-0.6,-0.6,0.4},
+    {-0.6,0.6,0.4},
+    {0.6,0.6,0.4},
+    {0.6,-0.6,0.4},
 };
 
 //vertices for door
 float ver3[][3]=
 {
-    {-0.15,-0.76,0.5},
-    {-0.15,0.76,0.5},
-    {0.15,0.76,0.5},
-    {0.15,-0.76,0.5},
-    {-0.15,-0.76,0.0},
-    {-0.15,0.76,0.0},
-    {0.15,0.76,0.0},
-    {0.15,-0.76,0.0},
-    
-};
-
-//vertices for door arch
-float ver8[][3]=
-{
-    {-0.15,-0.76,0.6},
-    {-0.15,0.76,0.6},
-    {0.15,0.76,0.6},
-    {0.15,-0.76,0.6},
-    {-0.15,-0.76,0.5},
-    {-0.15,0.76,0.5},
-    {0.15,0.76,0.5},
-    {0.15,-0.76,0.5},
+    {-0.18,-0.96,0.7},
+    {-0.18,0.96,0.7},
+    {0.18,0.96,0.7},
+    {0.18,-0.96,0.7},
+    {-0.18,-0.96,0.0},
+    {-0.18,0.96,0.0},
+    {0.18,0.96,0.0},
+    {0.18,-0.96,0.0},
     
 };
 
 //vertices for left window
 float ver4[][3]=
 {
-    {-0.6,-0.76,0.9},
-    {-0.6,0.76,0.9},
-    {-0.45,0.76,0.9},
-    {-0.45,-0.76,0.9},
-    {-0.6,-0.76,0.7},
-    {-0.6,0.76,0.7},
-    {-0.45,0.76,0.7},
-    {-0.45,-0.76,0.7},
+    {-0.5,-0.96,0.9},
+    {-0.5,0.96,0.9},
+    {-0.3,0.96,0.9},
+    {-0.3,-0.96,0.9},
+    {-0.5,-0.96,0.65},
+    {-0.5,0.96,0.65},
+    {-0.3,0.96,0.65},
+    {-0.3,-0.96,0.65},
 };
 
 //vertices for right window
 float ver5[][3]=
 {
-    {0.6,-0.76,0.9},
-    {0.6,0.76,0.9},
-    {0.45,0.76,0.9},
-    {0.45,-0.76,0.9},
-    {0.6,-0.76,0.7},
-    {0.6,0.76,0.7},
-    {0.45,0.76,0.7},
-    {0.45,-0.76,0.7},
+    {0.5,-0.96,0.9},
+    {0.5,0.96,0.9},
+    {0.3,0.96,0.9},
+    {0.3,-0.96,0.9},
+    {0.5,-0.96,0.65},
+    {0.5,0.96,0.65},
+    {0.3,0.96,0.65},
+    {0.3,-0.96,0.65},
 };
 
 //vertices for left window number 2
 float ver6[][3]=
 {
-    {-0.35,-0.76,0.9},
-    {-0.35,0.76,0.9},
-    {-0.2,0.76,0.9},
-    {-0.2,-0.76,0.9},
-    {-0.35,-0.76,0.7},
-    {-0.35,0.76,0.7},
-    {-0.2,0.76,0.7},
-    {-0.2,-0.76,0.7},
+    {-0.5,-0.96,0.55},
+    {-0.5,0.96,0.55},
+    {-0.3,0.96,0.55},
+    {-0.3,-0.96,0.55},
+    {-0.5,-0.96,0.3},
+    {-0.5,0.96,0.3},
+    {-0.3,0.96,0.3},
+    {-0.3,-0.96,0.3},
 };
 
 //vertices for right window number 2
 float ver7[][3]=
 {
-    {0.35,-0.76,0.9},
-    {0.35,0.76,0.9},
-    {0.2,0.76,0.9},
-    {0.2,-0.76,0.9},
-    {0.35,-0.76,0.7},
-    {0.35,0.76,0.7},
-    {0.2,0.76,0.7},
-    {0.2,-0.76,0.7},
+    {0.5,-0.96,0.55},
+    {0.5,0.96,0.55},
+    {0.3,0.96,0.55},
+    {0.3,-0.96,0.55},
+    {0.5,-0.96,0.3},
+    {0.5,0.96,0.3},
+    {0.3,0.96,0.3},
+    {0.3,-0.96,0.3},
 };
 
 
@@ -151,6 +146,71 @@ GLfloat color[][3] =
     {0.973, 0.973, 1.000},
     
 };
+void drag (int x, int y) {
+    // Use mouse values to move the scenery around.
+    xm = double(x)/current_width;
+    ym = double(y)/current_height;
+    glutPostRedisplay();
+}
+void drawGumbaz(GLfloat x, GLfloat y, GLfloat z, GLfloat sx, GLfloat sy, GLfloat sz)
+{
+    //glLoadIdentity();
+    GLUquadricObj *qobj = gluNewQuadric();
+    gluQuadricDrawStyle(qobj, GLU_FILL);
+    gluQuadricNormals(qobj, GLU_FLAT);
+    glScalef(sx, sy, sz);
+    
+    
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glTranslatef(x, y, z);
+    glTranslatef(0.2, 0.2, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(-0.4, 0.0, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(0.0, -0.4, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(0.4, 0.0, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glPopMatrix();
+    
+    glPushMatrix();
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(x, y, z);
+    glTranslatef(0.0, 0.0, 1.0);
+    gluCylinder(qobj, 0.5, 0.5, 0.3, 40, 40);
+    glTranslatef(0.0, 0.0, 0.3);
+    gluSphere(qobj, 0.5, 60, 60);
+    glTranslatef(0.0, 0.0, 0.3);
+    gluCylinder(qobj, 0.41, 0.01, 0.3, 30, 30);
+    glTranslatef(0.0, 0.0, 0.3);
+    gluCylinder(qobj, 0.01, 0.0, 2, 30, 30);
+    glTranslatef(0.0, 0.0, 0.10);
+    gluSphere(qobj, 0.05, 60, 60);
+    glTranslatef(0.0, 0.0, 0.15);
+    gluSphere(qobj, 0.09, 60, 60);
+    glTranslatef(0.0, 0.0, 0.02);
+    gluCylinder(qobj, 0.03, 0.0, 0.45, 30, 30);
+    glTranslatef(0.0, 0.0, -0.55);
+    glColor3f(1.0, 1.0, 0.0);
+    glScalef(0.5,0.5,1.0);
+    glutSolidTorus(0.017,0.775,100,50);
+    glPopMatrix();
+    
+    glScalef(1/sx, 1/sy, 1/sz);
+}
+
+void drawSmallTowers()
+{
+    
+    glPushMatrix();
+    drawGumbaz(2.6, 2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(-2.6, 2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(2.6, -2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(-2.6, -2.6, 4.2, 0.3, 0.3, 0.3);
+    glPopMatrix();
+}
+
 
 //Code segment to draw a single tower
 void drawTower()
@@ -172,7 +232,7 @@ void drawTower()
     glTranslatef(0.0, 0.0, 0.75);
     gluDisk(qobj, 0.0, 0.15, 100, 5);
     
-    /*** Draw little cylinder ***/
+    /*** Draw the little cylinder ***/
     gluCylinder(qobj, 0.10, 0.10, 0.15, 20, 5);
     
     glTranslatef(0.0, 0.0, 0.15);
@@ -209,21 +269,6 @@ GLuint createDL() {
     //generate the list
     glNewList(loopDL, GL_COMPILE);
     
-    /* @Nan: Don't know why it doesn't work
-    for(int i = -1.25; i < 1.25; i+=2.5)
-    {
-        glPushMatrix();
-        glTranslatef(i, 1.25, 0.1);
-        glCallList(towerDL);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(i, -1.25, 0.1);
-        glCallList(towerDL);
-        glPopMatrix();
-    }
-     */
-    
     glPushMatrix();
     glTranslatef(-1.25, -1.25, 0.1);
     glCallList(towerDL);
@@ -248,6 +293,7 @@ GLuint createDL() {
     return(loopDL);
 }
 
+//Draw body of the Taj
 void quad(int a,int b,int c,int d)
 {
     //bigger base
@@ -343,15 +389,6 @@ void quad(int a,int b,int c,int d)
     glVertex3fv(ver7[d]);
     glEnd();
     
-    //door arch
-    glBegin(GL_QUADS);
-    glColor3f(1.0,0.0,0.0);
-    glVertex3fv(ver8[a]);
-    glVertex3fv(ver8[b]);
-    glVertex3fv(ver8[c]);
-    glVertex3fv(ver8[d]);
-    glEnd();
-    
 }
 
 void ColorBody()
@@ -372,7 +409,7 @@ void init(void)
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    glOrtho(-40.0, 40.0, -40.0, 40.0, -40.0, 40.0);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_LIGHTING);
@@ -390,13 +427,19 @@ void init(void)
     
 }
 
-
+/*
+ *
+ */
 void specialKeys( int key, int x, int y )
 {
     if (key == GLUT_KEY_RIGHT)
         rotate_x -= 5.0;
     else if (key == GLUT_KEY_LEFT)
         rotate_x -= -5.0;
+    else if (key == GLUT_KEY_UP)
+        rotate_y -= 5.0;
+    else if (key == GLUT_KEY_DOWN)
+        rotate_y += 5.0;
     
     glutPostRedisplay();
 }
@@ -417,17 +460,20 @@ void mydisplay(void)
     
     gluLookAt
     (
-     3, 3, 3,
-     0, 0, 0,
-     0, 0, 1
-     );
+     x, y, z,
+     x + lx,y + ly,z + lz,
+     0.0f, 0.0f, 1.0f);
     
     glRotatef( rotate_x, 0.0, 0.0, 1.0 );
+    glRotatef(rotate_y, 1.0, 0.0, 0.0);
     ColorBody();
     towersDLid = createDL();
     glCallList(towersDLid);
+    
+    drawGumbaz(0, 0, 0.4, 1, 1, 1);
+    drawSmallTowers();
+    
     glFlush();
-    //glutSwapBuffers();
 }
 
 // keyboard callback function that exits the application when "q" is pressed
@@ -456,9 +502,9 @@ void reshape(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if (w <= h)
-        glOrtho(-30.0, 30.0, -30.0 * (GLfloat) h / (GLfloat) w, 30.0 * (GLfloat) h / (GLfloat) w, -30.0, 30.0);
+        glOrtho(-40.0, 40.0, -40.0 * (GLfloat) h / (GLfloat) w, 40.0 * (GLfloat) h / (GLfloat) w, -40.0, 40.0);
     else
-        glOrtho(-30.0 * (GLfloat) w / (GLfloat) h, 30.0 * (GLfloat) w / (GLfloat) h, -30.0, 30.0, -30.0, 30.0);
+        glOrtho(-40.0 * (GLfloat) w / (GLfloat) h, 40.0 * (GLfloat) w / (GLfloat) h, -40.0, 40.0, -40.0, 40.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -467,11 +513,12 @@ int main(int argc, char** argv)
 {
     glutInit(&argc,argv); //set window properties
     glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
-    glutInitWindowSize(800,600);
+    glutInitWindowSize(800,800);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Project 1: Taj Mahal");
     glutDisplayFunc(mydisplay); //display callback
     glutSpecialFunc(specialKeys);
+    glutMotionFunc(drag);
     init(); //set OpenGL state
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
