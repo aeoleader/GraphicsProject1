@@ -15,7 +15,14 @@
 #include <GLUT/glut.h>
 #include <stdlib.h>
 
+const int INIT_WINDOW_SIZE = 800;
+int current_width = INIT_WINDOW_SIZE;
+int current_height = INIT_WINDOW_SIZE;
 static double rotate_x = 0;
+
+static double rotate_y = 0;
+double xm = 0.0;
+double ym = 0.0;
 GLuint towersDLid;
 
 //vertices for base
@@ -137,6 +144,71 @@ GLfloat color[][3] =
     {0.973, 0.973, 1.000},
     
 };
+void drag (int x, int y) {
+    // Use mouse values to move the scenery around.
+    xm = double(x)/current_width;
+    ym = double(y)/current_height;
+    glutPostRedisplay();
+}
+void drawGumbaz(GLfloat x, GLfloat y, GLfloat z, GLfloat sx, GLfloat sy, GLfloat sz)
+{
+    //glLoadIdentity();
+    GLUquadricObj *qobj = gluNewQuadric();
+    gluQuadricDrawStyle(qobj, GLU_FILL);
+    gluQuadricNormals(qobj, GLU_FLAT);
+    glScalef(sx, sy, sz);
+    
+    
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glTranslatef(x, y, z);
+    glTranslatef(0.2, 0.2, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(-0.4, 0.0, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(0.0, -0.4, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(0.4, 0.0, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glPopMatrix();
+    
+    glPushMatrix();
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(x, y, z);
+    glTranslatef(0.0, 0.0, 1.0);
+    gluCylinder(qobj, 0.5, 0.5, 0.3, 40, 40);
+    glTranslatef(0.0, 0.0, 0.3);
+    gluSphere(qobj, 0.5, 60, 60);
+    glTranslatef(0.0, 0.0, 0.3);
+    gluCylinder(qobj, 0.41, 0.01, 0.3, 30, 30);
+    glTranslatef(0.0, 0.0, 0.3);
+    gluCylinder(qobj, 0.01, 0.0, 2, 30, 30);
+    glTranslatef(0.0, 0.0, 0.10);
+    gluSphere(qobj, 0.05, 60, 60);
+    glTranslatef(0.0, 0.0, 0.15);
+    gluSphere(qobj, 0.09, 60, 60);
+    glTranslatef(0.0, 0.0, 0.02);
+    gluCylinder(qobj, 0.03, 0.0, 0.45, 30, 30);
+    glTranslatef(0.0, 0.0, -0.55);
+    glColor3f(1.0, 1.0, 0.0);
+    glScalef(0.5,0.5,1.0);
+    glutSolidTorus(0.017,0.775,100,50);
+    glPopMatrix();
+    
+    glScalef(1/sx, 1/sy, 1/sz);
+}
+
+void drawSmallTowers()
+{
+    
+    glPushMatrix();
+    drawGumbaz(2.6, 2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(-2.6, 2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(2.6, -2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(-2.6, -2.6, 4.2, 0.3, 0.3, 0.3);
+    glPopMatrix();
+}
+
 
 //Code segment to draw a single tower
 void drawTower()
@@ -375,6 +447,8 @@ void specialKeys( int key, int x, int y )
         rotate_x -= 5.0;
     else if (key == GLUT_KEY_LEFT)
         rotate_x -= -5.0;
+    else if (key == GLUT_KEY_UP)
+        rotate_y -= 5.0;
     
     glutPostRedisplay();
 }
@@ -395,15 +469,21 @@ void mydisplay(void)
     
     gluLookAt
     (
-     3, 3, 3,
+     5, 3, 3,
      0, 0, 0,
      0, 0, 1
      );
     
     glRotatef( rotate_x, 0.0, 0.0, 1.0 );
+    glRotatef(0.0, rotate_y, 0.0, 1.0);
+    //glTranslatef(0.0, -4, -2.0);
     ColorBody();
     towersDLid = createDL();
     glCallList(towersDLid);
+
+    drawGumbaz(0, 0, 0.4, 1, 1, 1);
+        drawSmallTowers();
+
     glFlush();
     //glutSwapBuffers();
 }
@@ -445,11 +525,12 @@ int main(int argc, char** argv)
 {
     glutInit(&argc,argv); //set window properties
     glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
-    glutInitWindowSize(800,700);
+    glutInitWindowSize(800,800);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Project 1: Taj Mahal");
     glutDisplayFunc(mydisplay); //display callback
     glutSpecialFunc(specialKeys);
+    glutMotionFunc(drag);
     init(); //set OpenGL state
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
