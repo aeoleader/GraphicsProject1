@@ -7,6 +7,7 @@ Use OpenGL to create an architectural drawing using orthographic projection in 3
 ——————————————————————————————————————————————————————————————————————————————————
 
 - Usage
+- 
 1. Run
 	Include OpenGL and GLUT libraries and run the source code in XCode.
 
@@ -17,7 +18,7 @@ Use OpenGL to create an architectural drawing using orthographic projection in 3
 	 ‘i’  - zoom in
 	 ‘o’  - zoom out
          
-      - Arrow keys are for rotation: 
+      - Arrow keys are used for rotation: 
 	 up   - upward rotation
 	down  - downward rotation
 	left  - left rotation
