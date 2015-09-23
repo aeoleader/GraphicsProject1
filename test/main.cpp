@@ -1,25 +1,55 @@
-//rotate using the left and the right arrow
-//wireframe - 'w'
-//filled - 'f'
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * CSCI 300 Graphics Project 1 - Taj Mahal
+ *
+ * Nan Jiang, Pratistha Bhandari, Xiangyu Li *
+ *
+ * main.cpp - An implementation file using OpenGL to build a 3D building.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* Activity.cpp
- 
- September 14th, 2007*/
-
-/* Starter file for in class activity
- 
- */
 #include <math.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #include <stdlib.h>
 
-static double rotate_x = 0;
+const int INIT_WINDOW_SIZE = 800;
+int current_width = INIT_WINDOW_SIZE;
+int current_height = INIT_WINDOW_SIZE;
+
+static double rotate_x = -58.0;
+static double rotate_y = 0;
+
+double cmx = 0.0;
+double cmy = 0.0;
+double cmz = 0.0;
+
+double xm = 0.0;
+double ym = 0.0;
+
+float x=5.0f,y=3.0f,z=3.0f;       // camera points
+float lx=-5.0f,ly=-3.0f,lz=-2.0f; // reference points
+float zoomFactor = 60;
+
 GLuint towersDLid;
 
-//vertices for base
-//@Nan: I changed the values from 1.25 to 1.50 to make the base bigger.
+
+void mirror (bool p) {
+    // The mirror is a rectangle normal to the X axis.
+    if (p)
+    {
+        glBegin(GL_QUADS);
+        glColor4f(0.0, 0.5, 0.0, 0.3);
+    }// Draw whole mirror
+    else
+        glBegin(GL_LINE_LOOP);	// Draw frame of mirror only
+    glVertex3f(cmx-4, cmy - 4, cmz);
+    glVertex3f(cmx-4, cmy + 4, cmz);
+    glVertex3f(cmx+4, cmy + 4, cmz);
+    glVertex3f(cmx+4, cmy - 4, cmz);
+    glEnd();
+}
+
 float ver[][3] =
 {
     {-1.50,-1.50,0.10},
@@ -137,6 +167,76 @@ GLfloat color[][3] =
     {0.973, 0.973, 1.000},
     
 };
+void drag (int x, int y) {
+    // Use mouse values to move the scenery around.
+    xm = double(x)/current_width;
+    ym = double(y)/current_height;
+    glutPostRedisplay();
+}
+
+//Code segment to draw a gumbaz.
+//Para: x, y, z are coordinates of starting orgin for the gumbaz. sx, sy and sz are scaling parameters to change the scale of teh gumbaz.
+void drawGumbaz(GLfloat x, GLfloat y, GLfloat z, GLfloat sx, GLfloat sy, GLfloat sz)
+{
+    //glLoadIdentity();
+    GLUquadricObj *qobj = gluNewQuadric();
+    gluQuadricDrawStyle(qobj, GLU_FILL);
+    gluQuadricNormals(qobj, GLU_FLAT);
+    glScalef(sx, sy, sz); // Change the scale of gumbaz
+    
+    //Create four supporting pillar.
+    glPushMatrix();
+    glColor4f(1.0, 1.0, 1.0, 1.0);
+    glTranslatef(x, y, z);
+    glTranslatef(0.2, 0.2, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(-0.4, 0.0, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(0.0, -0.4, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glTranslatef(0.4, 0.0, 0.0);
+    gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
+    glPopMatrix();
+    
+    //Create top of the gumbaz
+    glPushMatrix();
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0);
+    glTranslatef(x, y, z);
+    glTranslatef(0.0, 0.0, 1.0);
+    gluCylinder(qobj, 0.5, 0.5, 0.3, 40, 40);//Base cylinder
+    glTranslatef(0.0, 0.0, 0.3);
+    gluSphere(qobj, 0.5, 60, 60);//Dome sphere
+    glTranslatef(0.0, 0.0, 0.3);
+    gluCylinder(qobj, 0.41, 0.01, 0.3, 30, 30);//Protruding point of the dome
+    glTranslatef(0.0, 0.0, 0.3);
+    glColor4f(1.0, 1.0, 0.0, 1.0);
+    gluCylinder(qobj, 0.01, 0.0, 2, 30, 30);//Lighting rod
+    glTranslatef(0.0, 0.0, 0.10);
+    gluSphere(qobj, 0.05, 60, 60);//Small bead on the lighting rod
+    glTranslatef(0.0, 0.0, 0.15);
+    gluSphere(qobj, 0.09, 60, 60);//Big bead on the lighting rod
+    glTranslatef(0.0, 0.0, 0.02);
+    gluCylinder(qobj, 0.03, 0.0, 0.45, 30, 30);//Top cylinder
+    glTranslatef(0.0, 0.0, -0.55);
+    glScalef(0.5,0.5,1.0);//Change scale for torus
+    glutSolidTorus(0.017,0.775,100,50);
+    glScalef(2, 2, 1);//Scale back
+    glPopMatrix();
+    
+    glScalef(1/sx, 1/sy, 1/sz);//Change scale back to norm
+}
+
+void drawSmallTowers()
+{
+    
+    glPushMatrix();
+    drawGumbaz(2.6, 2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(-2.6, 2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(2.6, -2.6, 4.2, 0.3, 0.3, 0.3);
+    drawGumbaz(-2.6, -2.6, 4.2, 0.3, 0.3, 0.3);
+    glPopMatrix();
+}
+
 
 //Code segment to draw a single tower
 void drawTower()
@@ -158,7 +258,7 @@ void drawTower()
     glTranslatef(0.0, 0.0, 0.75);
     gluDisk(qobj, 0.0, 0.15, 100, 5);
     
-    /*** Draw little cylinder ***/
+    /*** Draw the little cylinder ***/
     gluCylinder(qobj, 0.10, 0.10, 0.15, 20, 5);
     
     glTranslatef(0.0, 0.0, 0.15);
@@ -182,59 +282,43 @@ void drawTower()
     glPopMatrix();
 }
 
-GLuint createDL() {
+// Create a display list building towers at each corner
+// Return the id of the display list
+GLuint createTowersDL() {
     GLuint towerDL,loopDL;
     
-    towerDL = glGenLists(1); //generate the id for the snowman displaylist
-    loopDL = glGenLists(2); //generate the id for the loop display list
+    towerDL = glGenLists(1); //generate the id for the tower displaylist
+    loopDL = glGenLists(2);  //generate the id for the loop display list
     
     glNewList(towerDL, GL_COMPILE);
     drawTower();
     glEndList();
     
-    //generate the list
     glNewList(loopDL, GL_COMPILE);
-    
-    /* @Nan: Don't know why it doesn't work
-     for(int i = -1.25; i < 1.25; i+=2.5)
-     {
-     glPushMatrix();
-     glTranslatef(i, 1.25, 0.1);
-     glCallList(towerDL);
-     glPopMatrix();
-     
-     glPushMatrix();
-     glTranslatef(i, -1.25, 0.1);
-     glCallList(towerDL);
-     glPopMatrix();
-     }
-     */
-    
     glPushMatrix();
-    glTranslatef(-1.25, -1.25, 0.1);
+    glTranslatef(-1.25*2, -1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(-1.25, 1.25, 0.1);
+    glTranslatef(-1.25*2, 1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(1.25, -1.25, 0.1);
+    glTranslatef(1.25*2, -1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(1.25, 1.25, 0.1);
+    glTranslatef(1.25*2, 1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
-    
     glEndList();
     return(loopDL);
 }
 
-//Draw body of the Taj
+//Draw body of the Taj Mahal
 void quad(int a,int b,int c,int d)
 {
     //bigger base
@@ -287,7 +371,7 @@ void quad(int a,int b,int c,int d)
     
     //door
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver3[a]);
     glVertex3fv(ver3[b]);
     glVertex3fv(ver3[c]);
@@ -296,7 +380,7 @@ void quad(int a,int b,int c,int d)
     
     //left window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver4[a]);
     glVertex3fv(ver4[b]);
     glVertex3fv(ver4[c]);
@@ -305,7 +389,7 @@ void quad(int a,int b,int c,int d)
     
     //right window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver5[a]);
     glVertex3fv(ver5[b]);
     glVertex3fv(ver5[c]);
@@ -314,7 +398,7 @@ void quad(int a,int b,int c,int d)
     
     //second left window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver6[a]);
     glVertex3fv(ver6[b]);
     glVertex3fv(ver6[c]);
@@ -323,7 +407,7 @@ void quad(int a,int b,int c,int d)
     
     //second right window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver7[a]);
     glVertex3fv(ver7[b]);
     glVertex3fv(ver7[c]);
@@ -332,6 +416,7 @@ void quad(int a,int b,int c,int d)
     
 }
 
+//colors the body of the Taj by calling the quad() function
 void ColorBody()
 {
     quad(0,3,2,1);
@@ -352,63 +437,76 @@ void init(void)
     glLoadIdentity();
     glOrtho(-40.0, 40.0, -40.0, 40.0, -40.0, 40.0);
     glEnable(GL_DEPTH_TEST);
-    
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    float lightColor[4]= {1, 1, 1, 1};
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
-    glEnable(GL_COLOR_MATERIAL);
+    glClearColor(0.0,0.0,0.0,0.0);
+    GLfloat black[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat cyan[] = { 0.0, 1.0, 1.0, 1.0 };
+    GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat direction[] = { 1.0, 1.0, 1.0, 0.0 };
     
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cyan);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 10);
+    
+    glLightfv(GL_LIGHT0, GL_AMBIENT, black);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, white);
+    glLightfv(GL_LIGHT0, GL_POSITION, direction);
+    glEnable(GL_COLOR_MATERIAL);
+    glClearStencil(0);
+    glEnable(GL_STENCIL_TEST);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
     
-    glShadeModel(GL_SMOOTH);   // Enable smooth shading
-    
     glMatrixMode(GL_MODELVIEW);
-    
-    
 }
-
-
-void specialKeys( int key, int x, int y )
+void scene()
 {
-    if (key == GLUT_KEY_RIGHT)
-        rotate_x -= 5.0;
-    else if (key == GLUT_KEY_LEFT)
-        rotate_x -= -5.0;
-    
-    glutPostRedisplay();
+    ColorBody();
+    glScalef(0.5, 0.5, 1.0);
+    towersDLid = createTowersDL();
+    glCallList(towersDLid);
+    glScalef(2, 2, 1);
+    drawGumbaz(0, 0, 0.4, 1, 1, 1);
+    drawSmallTowers();
 }
 
+//this function calls the necessary functions that display the Taj
 void mydisplay(void)
 {
     glClearColor( 0, 0, 0, 1 );
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-    glMatrixMode( GL_PROJECTION );
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    int w = glutGet( GLUT_WINDOW_WIDTH );
-    int h = glutGet( GLUT_WINDOW_HEIGHT );
-    gluPerspective( 60, w / h, 0.1, 100 );
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    gluPerspective(zoomFactor, w / h, 0.1, 100);
     
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     
     gluLookAt
     (
-     3, 3, 3,
-     0, 0, 0,
-     0, 0, 1
-     );
+     x, y, z,
+     x + lx,y + ly,z + lz,
+     0.0f, 0.0f, 1.0f);
     
-    glRotatef( rotate_x, 0.0, 0.0, 1.0 );
-    ColorBody();
-    towersDLid = createDL();
-    glCallList(towersDLid);
+    glRotatef(rotate_x, 0.0, 0.0, 1.0 );
+    glRotatef(rotate_y, 1.0, 0.0, 0.0);
+    mirror(true);
+    
+    // Draw the mirror frame.
+    glColor3f(0.7f, 0.7f, 0.7f);
+    mirror(false);
+    scene();
     glFlush();
-    //glutSwapBuffers();
+    glutSwapBuffers();
 }
 
-// keyboard callback function that exits the application when "q" is pressed
+
+// keyboard callback function
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
@@ -421,10 +519,33 @@ void keyboard(unsigned char key, int x, int y)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             mydisplay();
             break;
+        case 'i':
+            zoomFactor-=3;
+            glutPostRedisplay();
+            break;
+        case 'o':
+            zoomFactor+=3;
+            glutPostRedisplay();
+            break;
         case 27:
             exit(0);
             break;
     }
+}
+
+// arrow keys that are used to control the rotation of the object
+void specialKeys( int key, int x, int y )
+{
+    if (key == GLUT_KEY_RIGHT)
+        rotate_x -= 5.0;
+    else if (key == GLUT_KEY_LEFT)
+        rotate_x -= -5.0;
+    else if (key == GLUT_KEY_UP)
+        rotate_y += 5.0;
+    else if (key == GLUT_KEY_DOWN)
+        rotate_y -= 5.0;
+    
+    glutPostRedisplay();
 }
 
 // reshape function
@@ -443,18 +564,17 @@ void reshape(int w, int h)
 
 int main(int argc, char** argv)
 {
-    glutInit(&argc,argv); //set window properties
+    glutInit(&argc,argv);           //set window properties
     glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
-    glutInitWindowSize(800,700);
+    glutInitWindowSize(800,800);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Project 1: Taj Mahal");
-    glutDisplayFunc(mydisplay); //display callback
+    glutDisplayFunc(mydisplay);     //display callback
     glutSpecialFunc(specialKeys);
-    init(); //set OpenGL state
+    init();                         //set OpenGL state
     glutReshapeFunc(reshape);
+    glutMotionFunc(drag);
     glutKeyboardFunc(keyboard);
     
-    glutMainLoop();//enter event loop
+    glutMainLoop();                 //enter event loop
 }
-
-
