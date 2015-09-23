@@ -1,14 +1,12 @@
-//rotate using the left and the right arrow
-//wireframe - 'w'
-//filled - 'f'
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * CSCI 300 Graphics Project 1 - Taj Mahal
+ *
+ * Nan Jiang, Pratistha Bhandari, Xiangyu Li *
+ *
+ * main.cpp - An implementation file using OpenGL to build a 3D building.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* main.cpp
- 
- September 23rd, 2015*/
-
-/* Starter file for in class activity
- 
- */
 #include <math.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
@@ -18,15 +16,18 @@
 const int INIT_WINDOW_SIZE = 800;
 int current_width = INIT_WINDOW_SIZE;
 int current_height = INIT_WINDOW_SIZE;
-static double rotate_x = -58.0;
 
+static double rotate_x = -58.0;
 static double rotate_y = 0;
+
 double xm = 0.0;
 double ym = 0.0;
-GLuint towersDLid;
 
-float x=5.0f,y=3.0f,z=3.0f;    // camera points
+float x=5.0f,y=3.0f,z=3.0f;       // camera points
 float lx=-5.0f,ly=-3.0f,lz=-2.0f; // reference points
+float zoomFactor = 60;
+
+GLuint towersDLid;
 
 //vertices for base
 float ver[][3] =
@@ -256,19 +257,19 @@ void drawTower()
     glPopMatrix();
 }
 
-GLuint createDL() {
+// Create a display list building towers at each corner
+// Return the id of the display list
+GLuint createTowersDL() {
     GLuint towerDL,loopDL;
     
-    towerDL = glGenLists(1); //generate the id for the snowman displaylist
-    loopDL = glGenLists(2); //generate the id for the loop display list
+    towerDL = glGenLists(1); //generate the id for the tower displaylist
+    loopDL = glGenLists(2);  //generate the id for the loop display list
     
     glNewList(towerDL, GL_COMPILE);
     drawTower();
     glEndList();
     
-    //generate the list
     glNewList(loopDL, GL_COMPILE);
-    
     glPushMatrix();
     glTranslatef(-1.25, -1.25, 0.1);
     glCallList(towerDL);
@@ -288,12 +289,11 @@ GLuint createDL() {
     glTranslatef(1.25, 1.25, 0.1);
     glCallList(towerDL);
     glPopMatrix();
-    
     glEndList();
     return(loopDL);
 }
 
-//Draw body of the Taj
+//Draw body of the Taj Mahal
 void quad(int a,int b,int c,int d)
 {
     //bigger base
@@ -423,25 +423,6 @@ void init(void)
     glShadeModel(GL_SMOOTH);   // Enable smooth shading
     
     glMatrixMode(GL_MODELVIEW);
-    
-    
-}
-
-/*
- *
- */
-void specialKeys( int key, int x, int y )
-{
-    if (key == GLUT_KEY_RIGHT)
-        rotate_x -= 5.0;
-    else if (key == GLUT_KEY_LEFT)
-        rotate_x -= -5.0;
-    else if (key == GLUT_KEY_UP)
-        rotate_y -= 5.0;
-    else if (key == GLUT_KEY_DOWN)
-        rotate_y += 5.0;
-    
-    glutPostRedisplay();
 }
 
 void mydisplay(void)
@@ -449,11 +430,11 @@ void mydisplay(void)
     glClearColor( 0, 0, 0, 1 );
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-    glMatrixMode( GL_PROJECTION );
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    int w = glutGet( GLUT_WINDOW_WIDTH );
-    int h = glutGet( GLUT_WINDOW_HEIGHT );
-    gluPerspective( 60, w / h, 0.1, 100 );
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    gluPerspective(zoomFactor, w / h, 0.1, 100);
     
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
@@ -467,7 +448,7 @@ void mydisplay(void)
     glRotatef( rotate_x, 0.0, 0.0, 1.0 );
     glRotatef(rotate_y, 1.0, 0.0, 0.0);
     ColorBody();
-    towersDLid = createDL();
+    towersDLid = createTowersDL();
     glCallList(towersDLid);
     
     drawGumbaz(0, 0, 0.4, 1, 1, 1);
@@ -476,7 +457,7 @@ void mydisplay(void)
     glFlush();
 }
 
-// keyboard callback function that exits the application when "q" is pressed
+// keyboard callback function
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
@@ -489,10 +470,33 @@ void keyboard(unsigned char key, int x, int y)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             mydisplay();
             break;
+        case 'i':
+            zoomFactor-=3;
+            glutPostRedisplay();
+            break;
+        case 'o':
+            zoomFactor+=3;
+            glutPostRedisplay();
+            break;
         case 27:
             exit(0);
             break;
     }
+}
+
+// arrow keys that are used to control the rotation of the object
+void specialKeys( int key, int x, int y )
+{
+    if (key == GLUT_KEY_RIGHT)
+        rotate_x -= 5.0;
+    else if (key == GLUT_KEY_LEFT)
+        rotate_x -= -5.0;
+    else if (key == GLUT_KEY_UP)
+        rotate_y -= 5.0;
+    else if (key == GLUT_KEY_DOWN)
+        rotate_y += 5.0;
+    
+    glutPostRedisplay();
 }
 
 // reshape function
@@ -511,17 +515,17 @@ void reshape(int w, int h)
 
 int main(int argc, char** argv)
 {
-    glutInit(&argc,argv); //set window properties
+    glutInit(&argc,argv);           //set window properties
     glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
     glutInitWindowSize(800,800);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Project 1: Taj Mahal");
-    glutDisplayFunc(mydisplay); //display callback
+    glutDisplayFunc(mydisplay);     //display callback
     glutSpecialFunc(specialKeys);
     glutMotionFunc(drag);
-    init(); //set OpenGL state
+    init();                         //set OpenGL state
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     
-    glutMainLoop();//enter event loop
+    glutMainLoop();                 //enter event loop
 }
