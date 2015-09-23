@@ -20,6 +20,10 @@ int current_height = INIT_WINDOW_SIZE;
 static double rotate_x = -58.0;
 static double rotate_y = 0;
 
+double cmx = 0.0;
+double cmy = 0.0;
+double cmz = 0.0;
+
 double xm = 0.0;
 double ym = 0.0;
 
@@ -29,7 +33,23 @@ float zoomFactor = 60;
 
 GLuint towersDLid;
 
-//vertices for base
+
+void mirror (bool p) {
+    // The mirror is a rectangle normal to the X axis.
+    if (p)
+    {
+        glBegin(GL_QUADS);
+        glColor4f(0.0, 0.5, 0.0, 0.3);
+    }// Draw whole mirror
+    else
+        glBegin(GL_LINE_LOOP);	// Draw frame of mirror only
+    glVertex3f(cmx-4, cmy - 4, cmz);
+    glVertex3f(cmx-4, cmy + 4, cmz);
+    glVertex3f(cmx+4, cmy + 4, cmz);
+    glVertex3f(cmx+4, cmy - 4, cmz);
+    glEnd();
+}
+
 float ver[][3] =
 {
     {-1.50,-1.50,0.10},
@@ -153,17 +173,20 @@ void drag (int x, int y) {
     ym = double(y)/current_height;
     glutPostRedisplay();
 }
+
+//Code segment to draw a gumbaz.
+//Para: x, y, z are coordinates of starting orgin for the gumbaz. sx, sy and sz are scaling parameters to change the scale of teh gumbaz.
 void drawGumbaz(GLfloat x, GLfloat y, GLfloat z, GLfloat sx, GLfloat sy, GLfloat sz)
 {
     //glLoadIdentity();
     GLUquadricObj *qobj = gluNewQuadric();
     gluQuadricDrawStyle(qobj, GLU_FILL);
     gluQuadricNormals(qobj, GLU_FLAT);
-    glScalef(sx, sy, sz);
+    glScalef(sx, sy, sz); // Change the scale of gumbaz
     
-    
+    //Create four supporting pillar.
     glPushMatrix();
-    glColor3f(1.0, 1.0, 1.0);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
     glTranslatef(x, y, z);
     glTranslatef(0.2, 0.2, 0.0);
     gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
@@ -175,30 +198,32 @@ void drawGumbaz(GLfloat x, GLfloat y, GLfloat z, GLfloat sx, GLfloat sy, GLfloat
     gluCylinder(qobj, 0.1, 0.1, 1.0, 30, 30);
     glPopMatrix();
     
+    //Create top of the gumbaz
     glPushMatrix();
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0);
     glTranslatef(x, y, z);
     glTranslatef(0.0, 0.0, 1.0);
-    gluCylinder(qobj, 0.5, 0.5, 0.3, 40, 40);
+    gluCylinder(qobj, 0.5, 0.5, 0.3, 40, 40);//Base cylinder
     glTranslatef(0.0, 0.0, 0.3);
-    gluSphere(qobj, 0.5, 60, 60);
+    gluSphere(qobj, 0.5, 60, 60);//Dome sphere
     glTranslatef(0.0, 0.0, 0.3);
-    gluCylinder(qobj, 0.41, 0.01, 0.3, 30, 30);
+    gluCylinder(qobj, 0.41, 0.01, 0.3, 30, 30);//Protruding point of the dome
     glTranslatef(0.0, 0.0, 0.3);
-    gluCylinder(qobj, 0.01, 0.0, 2, 30, 30);
+    glColor4f(1.0, 1.0, 0.0, 1.0);
+    gluCylinder(qobj, 0.01, 0.0, 2, 30, 30);//Lighting rod
     glTranslatef(0.0, 0.0, 0.10);
-    gluSphere(qobj, 0.05, 60, 60);
+    gluSphere(qobj, 0.05, 60, 60);//Small bead on the lighting rod
     glTranslatef(0.0, 0.0, 0.15);
-    gluSphere(qobj, 0.09, 60, 60);
+    gluSphere(qobj, 0.09, 60, 60);//Big bead on the lighting rod
     glTranslatef(0.0, 0.0, 0.02);
-    gluCylinder(qobj, 0.03, 0.0, 0.45, 30, 30);
+    gluCylinder(qobj, 0.03, 0.0, 0.45, 30, 30);//Top cylinder
     glTranslatef(0.0, 0.0, -0.55);
-    glColor3f(1.0, 1.0, 0.0);
-    glScalef(0.5,0.5,1.0);
+    glScalef(0.5,0.5,1.0);//Change scale for torus
     glutSolidTorus(0.017,0.775,100,50);
+    glScalef(2, 2, 1);//Scale back
     glPopMatrix();
     
-    glScalef(1/sx, 1/sy, 1/sz);
+    glScalef(1/sx, 1/sy, 1/sz);//Change scale back to norm
 }
 
 void drawSmallTowers()
@@ -271,22 +296,22 @@ GLuint createTowersDL() {
     
     glNewList(loopDL, GL_COMPILE);
     glPushMatrix();
-    glTranslatef(-1.25, -1.25, 0.1);
+    glTranslatef(-1.25*2, -1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(-1.25, 1.25, 0.1);
+    glTranslatef(-1.25*2, 1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(1.25, -1.25, 0.1);
+    glTranslatef(1.25*2, -1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(1.25, 1.25, 0.1);
+    glTranslatef(1.25*2, 1.25*2, 0.1);
     glCallList(towerDL);
     glPopMatrix();
     glEndList();
@@ -343,10 +368,10 @@ void quad(int a,int b,int c,int d)
     glNormal3f(0, 0, 1);
     glVertex3fv(ver2[d]);
     glEnd();
-    
+
     //door
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver3[a]);
     glVertex3fv(ver3[b]);
     glVertex3fv(ver3[c]);
@@ -355,7 +380,7 @@ void quad(int a,int b,int c,int d)
     
     //left window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver4[a]);
     glVertex3fv(ver4[b]);
     glVertex3fv(ver4[c]);
@@ -364,7 +389,7 @@ void quad(int a,int b,int c,int d)
     
     //right window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver5[a]);
     glVertex3fv(ver5[b]);
     glVertex3fv(ver5[c]);
@@ -373,7 +398,7 @@ void quad(int a,int b,int c,int d)
     
     //second left window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver6[a]);
     glVertex3fv(ver6[b]);
     glVertex3fv(ver6[c]);
@@ -382,7 +407,7 @@ void quad(int a,int b,int c,int d)
     
     //second right window
     glBegin(GL_QUADS);
-    glColor3f(0.0,0.0,0.0);
+    glColor4f(0.0, 0.0, 0.0, 1.0);
     glVertex3fv(ver7[a]);
     glVertex3fv(ver7[b]);
     glVertex3fv(ver7[c]);
@@ -411,20 +436,46 @@ void init(void)
     glLoadIdentity();
     glOrtho(-40.0, 40.0, -40.0, 40.0, -40.0, 40.0);
     glEnable(GL_DEPTH_TEST);
-    
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    float lightColor[4]= {1, 1, 1, 1};
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
-    glEnable(GL_COLOR_MATERIAL);
+    glClearColor(0.0,0.0,0.0,0.0);
+    //float lightColor[4]= {1.0, 1.0, 0.3, 1.0};
+    GLfloat black[] = { 0.0, 0.0, 0.0, 1.0 };
+    //GLfloat yellow[] = { 0.5, 0.35, 0.0, 1.0 };
+    GLfloat cyan[] = { 0.0, 1.0, 1.0, 1.0 };
+    GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat direction[] = { 1.0, 1.0, 1.0, 0.0 };
     
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cyan);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 10);
+    
+    glLightfv(GL_LIGHT0, GL_AMBIENT, black);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, yellow);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, white);
+    glLightfv(GL_LIGHT0, GL_POSITION, direction);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, lightColor);
+    glEnable(GL_COLOR_MATERIAL);
+    glClearStencil(0);
+    glEnable(GL_STENCIL_TEST);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
     
-    glShadeModel(GL_SMOOTH);   // Enable smooth shading
+    //glShadeModel(GL_SMOOTH);   // Enable smooth shading
     
     glMatrixMode(GL_MODELVIEW);
 }
-
+void scene()
+{
+    ColorBody();
+    glScalef(0.5, 0.5, 1.0);
+    towersDLid = createTowersDL();
+    glCallList(towersDLid);
+    glScalef(2, 2, 1);
+    drawGumbaz(0, 0, 0.4, 1, 1, 1);
+    drawSmallTowers();
+}
 void mydisplay(void)
 {
     glClearColor( 0, 0, 0, 1 );
@@ -445,17 +496,18 @@ void mydisplay(void)
      x + lx,y + ly,z + lz,
      0.0f, 0.0f, 1.0f);
     
-    glRotatef( rotate_x, 0.0, 0.0, 1.0 );
+    glRotatef(rotate_x, 0.0, 0.0, 1.0 );
     glRotatef(rotate_y, 1.0, 0.0, 0.0);
-    ColorBody();
-    towersDLid = createTowersDL();
-    glCallList(towersDLid);
+    mirror(true);
     
-    drawGumbaz(0, 0, 0.4, 1, 1, 1);
-    drawSmallTowers();
-    
+    // Draw the mirror frame.
+    glColor3f(0.7f, 0.7f, 0.7f);
+    mirror(false);
+    scene();
     glFlush();
+    glutSwapBuffers();
 }
+
 
 // keyboard callback function
 void keyboard(unsigned char key, int x, int y)
@@ -522,9 +574,9 @@ int main(int argc, char** argv)
     glutCreateWindow("Project 1: Taj Mahal");
     glutDisplayFunc(mydisplay);     //display callback
     glutSpecialFunc(specialKeys);
-    glutMotionFunc(drag);
     init();                         //set OpenGL state
     glutReshapeFunc(reshape);
+    glutMotionFunc(drag);
     glutKeyboardFunc(keyboard);
     
     glutMainLoop();                 //enter event loop
