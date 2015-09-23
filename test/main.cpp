@@ -544,9 +544,9 @@ void specialKeys( int key, int x, int y )
     else if (key == GLUT_KEY_LEFT)
         rotate_x -= -5.0;
     else if (key == GLUT_KEY_UP)
-        rotate_y -= 5.0;
-    else if (key == GLUT_KEY_DOWN)
         rotate_y += 5.0;
+    else if (key == GLUT_KEY_DOWN)
+        rotate_y -= 5.0;
     
     glutPostRedisplay();
 }
